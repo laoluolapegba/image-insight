@@ -2,7 +2,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-
+import { supabase } from "@/lib/supabaseClient";
+import OcrHistory from "@/components/OcrHistory";
 
 export default function ImageUpload() {
     const [ocrText, setOcrText] = useState<string | null>(null);
@@ -11,6 +12,15 @@ export default function ImageUpload() {
     const [file, setFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+
+
+    const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
+    const [summary, setSummary] = useState<string | null>(null);
+    const [bulletPoints, setBulletPoints] = useState<string[]>([]);
+
+
+    const [isSaving, setIsSaving] = useState(false);
+    const [reloadHistoryFlag, setReloadHistoryFlag] = useState(0);
 
     const handleFiles = useCallback((files: FileList | null) => {
         if (!files || files.length === 0) return;
@@ -73,7 +83,6 @@ export default function ImageUpload() {
             });
 
             const json = await res.json();
-            console.log("OCR Response:", json);
 
             if (!res.ok || json.error) {
                 alert("OCR failed: " + (json.error || "Unknown error"));
@@ -82,11 +91,71 @@ export default function ImageUpload() {
 
             setOcrText(json.rawText);
             setOcrConfidence(json.confidence);
+
+            // Save to Supabase
+            setIsSaving(true);
+            const {
+                data: { user },
+                error: userErr,
+            } = await supabase.auth.getUser();
+
+            if (userErr || !user) {
+                console.error("No user found for saving OCR result:", userErr);
+            } else {
+                const { error: insertErr } = await supabase.from("ocr_results").insert({
+                    user_id: user.id,
+                    file_name: file.name,
+                    raw_text: json.rawText,
+                    confidence: json.confidence,
+                });
+
+                if (insertErr) {
+                    console.error("Error saving OCR result:", insertErr);
+                } else {
+                    // trigger history refresh
+                    setReloadHistoryFlag((x) => x + 1);
+                }
+            }
         } catch (err) {
             console.error("Upload error", err);
             alert("Something went wrong uploading the file.");
         } finally {
             setIsUploading(false);
+            setIsSaving(false);
+        }
+    };
+
+
+    const onGenerateInsightsClick = async () => {
+        if (!ocrText) return;
+
+        try {
+            setIsGeneratingInsights(true);
+            setSummary(null);
+            setBulletPoints([]);
+
+            const res = await fetch("/api/generate-insights", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ rawText: ocrText }),
+            });
+
+            const json = await res.json();
+
+            if (!res.ok || json.error) {
+                alert("Insights failed: " + (json.error || "Unknown error"));
+                return;
+            }
+
+            setSummary(json.summary);
+            setBulletPoints(json.bulletPoints || []);
+        } catch (err) {
+            console.error("Insights error", err);
+            alert("Something went wrong generating insights.");
+        } finally {
+            setIsGeneratingInsights(false);
         }
     };
 
@@ -160,16 +229,16 @@ export default function ImageUpload() {
                     <button
                         type="button"
                         onClick={onUploadClick}
-                        disabled={!file}
+                        disabled={!file || isUploading}
                         className="w-full mt-2 inline-flex items-center justify-center rounded-lg border border-slate-300 bg-slate-900 text-white text-sm font-medium px-4 py-2.5 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-800 transition"
                     >
-                        Upload (stub for now)
+                        {isUploading ? "Extracting text..." : "Extract text"}
                     </button>
                 </div>
             )}
             {ocrText && (
-                <div className="mt-4 border border-slate-200 rounded-xl p-3 bg-white">
-                    <div className="flex items-center justify-between mb-2">
+                <div className="mt-4 border border-slate-200 rounded-xl p-3 bg-white space-y-3">
+                    <div className="flex items-center justify-between">
                         <h2 className="text-sm font-semibold text-slate-800">
                             Extracted Text
                         </h2>
@@ -182,6 +251,30 @@ export default function ImageUpload() {
                     <pre className="whitespace-pre-wrap text-xs text-slate-700 max-h-64 overflow-auto">
                         {ocrText}
                     </pre>
+
+                    <button
+                        type="button"
+                        onClick={onGenerateInsightsClick}
+                        disabled={isGeneratingInsights}
+                        className="mt-2 inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white text-xs font-medium px-3 py-1.5 disabled:opacity-50 hover:bg-slate-50 transition"
+                    >
+                        {isGeneratingInsights ? "Generating insights..." : "Generate Insights"}
+                    </button>
+                </div>
+            )}
+            <OcrHistory reloadKey={reloadHistoryFlag} />
+
+            {summary && (
+                <div className="mt-4 border border-slate-200 rounded-xl p-3 bg-white space-y-2">
+                    <h2 className="text-sm font-semibold text-slate-800">Insights</h2>
+                    <p className="text-xs text-slate-700">{summary}</p>
+                    {bulletPoints.length > 0 && (
+                        <ul className="list-disc pl-4 text-xs text-slate-700 space-y-1">
+                            {bulletPoints.map((bp, idx) => (
+                                <li key={idx}>{bp}</li>
+                            ))}
+                        </ul>
+                    )}
                 </div>
             )}
         </div>

@@ -1,4 +1,6 @@
+// app/page.tsx
 import ImageUpload from "@/components/ImageUpload";
+import AuthGate from "@/components/AuthGate";
 
 export default function Home() {
     return (
@@ -6,15 +8,17 @@ export default function Home() {
             <div className="max-w-3xl mx-auto px-4 py-10">
                 <header className="mb-8">
                     <h1 className="text-3xl font-semibold text-slate-900">
-                        Image → Text / Insight
+                        Image → Text
                     </h1>
                     <p className="mt-2 text-sm text-slate-600">
-                        Day 1: Upload an image and preview it.
-                        Next steps: extract text and generate insights.
+                        Upload an image, extract the text, and copy it out.
+                        (Insights / summaries can be plugged in later.)
                     </p>
                 </header>
 
-                <ImageUpload />
+                <AuthGate>
+                    <ImageUpload />
+                </AuthGate>
             </div>
         </main>
     );
