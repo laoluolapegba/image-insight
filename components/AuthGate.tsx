@@ -2,23 +2,34 @@
 
 import { ReactNode, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { useRouter } from "next/navigation";
 
 interface Props {
     children: ReactNode;
+    redirectTo?: string; // optional override
 }
 
-export default function AuthGate({ children }: Props) {
+export default function AuthGate({ children, redirectTo = "/auth" }: Props) {
     const [loading, setLoading] = useState(true);
     const [isAuthed, setIsAuthed] = useState(false);
-    const [email, setEmail] = useState<string | null>(null);
+    const router = useRouter();
 
     useEffect(() => {
+        let isMounted = true;
+
         const checkUser = async () => {
             const { data } = await supabase.auth.getUser();
             const user = data.user;
+
+            if (!isMounted) return;
+
             setIsAuthed(!!user);
-            setEmail(user?.email ?? null);
             setLoading(false);
+
+            // If not authed, route them to auth
+            if (!user) {
+                router.replace(redirectTo);
+            }
         };
 
         checkUser();
@@ -26,55 +37,29 @@ export default function AuthGate({ children }: Props) {
         const {
             data: { subscription },
         } = supabase.auth.onAuthStateChange((_event, session) => {
-            setIsAuthed(!!session?.user);
-            setEmail(session?.user?.email ?? null);
+            const authed = !!session?.user;
+            setIsAuthed(authed);
+
+            // if user signs out while on /app, send to auth
+            if (!authed) {
+                router.replace(redirectTo);
+            }
         });
 
         return () => {
+            isMounted = false;
             subscription.unsubscribe();
         };
-    }, []);
-
-    const handleSignOut = async () => {
-        await supabase.auth.signOut();
-    };
+    }, [router, redirectTo]);
 
     if (loading) {
-        return (
-            <div className="text-sm text-slate-600">
-                Checking session...
-            </div>
-        );
+        return <div className="text-sm text-slate-600">Checking session...</div>;
     }
 
+    // While redirecting, render nothing (prevents flicker)
     if (!isAuthed) {
-        return (
-            <div className="space-y-2">
-                <p className="text-sm text-slate-700">
-                    You need to sign in to use the tool.
-                </p>
-                <a
-                    href="/auth"
-                    className="inline-flex items-center text-sm text-slate-900 underline"
-                >
-                    Go to sign in / sign up
-                </a>
-            </div>
-        );
+        return null;
     }
 
-    return (
-        <div className="space-y-3">
-            <div className="flex items-center justify-between text-xs text-slate-600">
-                <span>Signed in as {email}</span>
-                <button
-                    onClick={handleSignOut}
-                    className="underline hover:text-slate-900"
-                >
-                    Sign out
-                </button>
-            </div>
-            {children}
-        </div>
-    );
+    return <>{children}</>;
 }
