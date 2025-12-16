@@ -2,6 +2,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getProvider, ProviderName } from "@/lib/ocr/getProvider";
+export const runtime = "nodejs";
 
 const ENABLE_TESSERACT = false; // flip later if you want
 
