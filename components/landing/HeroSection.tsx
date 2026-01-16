@@ -21,7 +21,7 @@ export default function HeroSection() {
 
                     <div className="flex items-center justify-center gap-4 mb-16">
                         <Link
-                            href="/get-started"
+                            href="/auth?mode=signup"
                             className={cn(
                                 "inline-flex items-center gap-2 rounded-full bg-[#566AF0] px-8 py-3.5 text-base font-semibold text-white transition-all hover:translate-y-[-1px] hover:bg-[#4355d6]",
                                 "btn-shadow"

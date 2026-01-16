@@ -22,16 +22,16 @@ export default function LandingNavbar() {
                     {/* Desktop Navigation */}
                     <nav className="hidden md:flex items-center gap-8">
                         <Link
-                            href="/auth"
+                            href="/auth?mode=signin"
                             className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
                         >
                             Sign in
                         </Link>
                         <Link
-                            href="/app"
+                            href="/auth?mode=signup"
                             className="inline-flex items-center justify-center px-6 py-2.5 text-sm font-semibold text-white bg-[#4F46E5] rounded-full hover:bg-[#4338CA] transition-all shadow-sm hover:shadow-md"
                         >
-                            Open App
+                            Sign up
                         </Link>
                     </nav>
 
@@ -49,16 +49,16 @@ export default function LandingNavbar() {
                     <div className="md:hidden py-4 border-t border-slate-100">
                         <nav className="flex flex-col gap-4">
                             <Link
-                                href="/auth"
+                                href="/auth?mode=signin"
                                 className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
                             >
                                 Sign in
                             </Link>
                             <Link
-                                href="/app"
+                                href="/auth?mode=signup"
                                 className="inline-flex items-center justify-center px-6 py-2.5 text-sm font-semibold text-white bg-[#4F46E5] rounded-full hover:bg-[#4338CA] transition-all"
                             >
-                                Open App
+                                Sign up
                             </Link>
                         </nav>
                     </div>
