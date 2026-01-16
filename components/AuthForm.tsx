@@ -1,18 +1,27 @@
 // components/AuthForm.tsx
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
 type Mode = "signin" | "signup";
 
 export default function AuthForm() {
+    const searchParams = useSearchParams();
     const [mode, setMode] = useState<Mode>("signin");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const modeParam = searchParams.get("mode");
+        if (modeParam === "signin" || modeParam === "signup") {
+            setMode(modeParam);
+        }
+    }, [searchParams]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
