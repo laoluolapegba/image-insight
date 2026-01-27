@@ -2,13 +2,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
 type Mode = "signin" | "signup";
 
 export default function AuthForm() {
+    const router = useRouter();
     const searchParams = useSearchParams();
+
     const [mode, setMode] = useState<Mode>("signin");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -31,13 +33,17 @@ export default function AuthForm() {
 
         try {
             if (mode === "signup") {
-                const { error } = await supabase.auth.signUp({
-                    email,
-                    password,
-                });
+                const { data, error } = await supabase.auth.signUp({ email, password });
                 if (error) throw error;
 
-                setMessage("Sign up successful. Check your email (if confirmation is enabled), then sign in.");
+                // If email confirmation is OFF, Supabase may return a session immediately
+                if (data.session) {
+                    router.replace("/app");
+                    router.refresh();
+                    return;
+                }
+
+                setMessage("Sign up successful. Check your email, then sign in.");
             } else {
                 const { error } = await supabase.auth.signInWithPassword({
                     email,
@@ -45,10 +51,12 @@ export default function AuthForm() {
                 });
                 if (error) throw error;
 
-                setMessage("Signed in! Go back to the main page.");
+                router.replace("/app");
+                router.refresh();
+                return;
             }
         } catch (err: any) {
-            setError(err.message ?? "Authentication error");
+            setError(err?.message ?? "Authentication error");
         } finally {
             setLoading(false);
         }
@@ -80,7 +88,9 @@ export default function AuthForm() {
                         className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        autoComplete="current-password"
+                        autoComplete={
+                            mode === "signin" ? "current-password" : "new-password"
+                        }
                         required
                     />
                 </div>
@@ -102,20 +112,14 @@ export default function AuthForm() {
                     disabled={loading}
                     className="w-full inline-flex items-center justify-center rounded-lg bg-slate-900 text-white text-sm font-medium px-4 py-2.5 disabled:opacity-50 hover:bg-slate-800 transition"
                 >
-                    {loading
-                        ? "Please wait..."
-                        : mode === "signin"
-                            ? "Sign in"
-                            : "Sign up"}
+                    {loading ? "Please wait..." : mode === "signin" ? "Sign in" : "Sign up"}
                 </button>
             </form>
 
             <button
                 type="button"
                 className="mt-4 text-xs text-slate-600 hover:text-slate-900 underline"
-                onClick={() =>
-                    setMode((m) => (m === "signin" ? "signup" : "signin"))
-                }
+                onClick={() => setMode((m) => (m === "signin" ? "signup" : "signin"))}
             >
                 {mode === "signin"
                     ? "Need an account? Sign up"

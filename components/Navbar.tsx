@@ -50,7 +50,8 @@ export default function Navbar() {
         router.refresh();
     };
 
-    const onApp = pathname === "/app";
+    const onApp = pathname.startsWith("/app");
+
 
     return (
         <header className="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-transparent transition-all duration-300">
@@ -59,7 +60,7 @@ export default function Navbar() {
                     {/* Brand */}
                     <Link href="/" className="flex items-center group">
                         <img
-                            src="/images/imageLab_dark.png"
+                            src="/imageLab_dark.png"
                             className="h-7 sm:h-8 group-hover:scale-105 transition-transform"
                             alt="ImageLab Logo"
                         />

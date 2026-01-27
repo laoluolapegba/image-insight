@@ -1,8 +1,9 @@
 import MarketingNavbar from "@/components/landing/MarketingNavbar";
 import HeroSection from "@/components/landing/HeroSection";
-import FeatureSection from "@/components/landing/FeatureSection";
-import ComingSoonSection from "@/components/landing/ComingSoonSection";
+import ProductsGrid from "@/components/landing/ProductsGrid";
+import PrivacySection from "@/components/landing/PrivacySection";
 import FAQSection from "@/components/landing/FAQSection";
+import CTASection from "@/components/landing/CTASection";
 import Footer from "@/components/landing/Footer";
 
 export default function Home() {
@@ -11,8 +12,9 @@ export default function Home() {
             <MarketingNavbar />
             <main className="min-h-screen bg-white flex flex-col">
                 <HeroSection />
-                <FeatureSection />
-                <ComingSoonSection />
+                <ProductsGrid />
+                <PrivacySection />
+                <CTASection />
                 <FAQSection />
                 <Footer />
             </main>

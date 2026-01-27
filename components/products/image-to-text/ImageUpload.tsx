@@ -4,7 +4,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
-const DAILY_LIMIT = 30;
+const DAILY_LIMIT = 3;
 const SUPPORTED_FORMATS = "PNG, JPG, JPEG, WEBP";
 
 type ToastType = "success" | "error" | "info";
