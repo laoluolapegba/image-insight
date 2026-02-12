@@ -1,7 +1,17 @@
 import Link from "next/link";
-import { ArrowRight, ImageIcon, FileText, Layers, ShoppingCart, Bell, FileCheck } from "lucide-react";
+import { ArrowRight, ImageIcon, FileText, Layers, ShoppingCart, Bell, FileCheck, ReceiptText } from "lucide-react";
 
 const products = [
+    {
+        id: "invoice-parser",
+        name: "Invoice Parser",
+        description: "Drop a PDF or image invoice to get VAT-aware journal entries and UK tax explanations.",
+        icon: ReceiptText,
+        status: "live",
+        href: "/app/invoice-parser",
+        color: "from-emerald-500 to-teal-600",
+        features: ["UK VAT guidance", "Xero-ready CSV", "Plain-English insights"]
+    },
     {
         id: "image-to-text",
         name: "Image to Text",
