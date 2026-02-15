@@ -68,6 +68,17 @@ export default function Navbar() {
 
                     {/* Actions */}
                     <nav className="flex items-center gap-6">
+                        {onApp && (
+                            <div className="hidden md:flex items-center gap-4 text-sm">
+                                <Link href="/app/image-to-text" className="text-slate-600 hover:text-slate-900 transition-colors">
+                                    Image to Text
+                                </Link>
+                                <Link href="/app/image-converter" className="text-slate-600 hover:text-slate-900 transition-colors">
+                                    Image Converter
+                                </Link>
+                            </div>
+                        )}
+
                         {/* Sign In / Auth State - Text Link Style */}
                         {auth.status === "loading" ? (
                             <span className="text-xs text-slate-500">…</span>
