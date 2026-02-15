@@ -37,8 +37,8 @@ const products = [
         name: "Image → Multiple Formats",
         description: "Convert images to any format instantly. Support for PNG, JPG, WEBP, and more.",
         icon: Layers,
-        status: "coming-soon",
-        href: "#",
+        status: "live",
+        href: "/app/image-converter",
         color: "from-purple-500 to-pink-600",
         features: ["20+ formats", "Batch conversion", "Quality control"]
     },

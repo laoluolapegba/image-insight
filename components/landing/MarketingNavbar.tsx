@@ -14,10 +14,15 @@ export default function MarketingNavbar() {
     const router = useRouter();
 
     useEffect(() => {
-        checkAuth();
+        void supabase.auth.getSession().then(({ data: { session } }) => {
+            setIsAuthenticated(!!session);
+        }).catch((error) => {
+            console.error("Auth check error:", error);
+            setIsAuthenticated(false);
+        });
 
         // Listen for auth changes
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             setIsAuthenticated(!!session);
         });
 
@@ -25,16 +30,6 @@ export default function MarketingNavbar() {
             subscription.unsubscribe();
         };
     }, []);
-
-    const checkAuth = async () => {
-        try {
-            const { data: { session } } = await supabase.auth.getSession();
-            setIsAuthenticated(!!session);
-        } catch (error) {
-            console.error("Auth check error:", error);
-            setIsAuthenticated(false);
-        }
-    };
 
     const handleSignOut = async () => {
         try {
@@ -92,7 +87,7 @@ export default function MarketingNavbar() {
                                 Sign out
                             </button>
                             <Link
-                                href="/app/image-to-text"
+                                href="/app/image-converter"
                                 className={cn(
                                     "rounded-full bg-[#566AF0] px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#4355d6]",
                                     "btn-shadow"
@@ -175,7 +170,7 @@ export default function MarketingNavbar() {
                                         Sign out
                                     </button>
                                     <Link
-                                        href="/app/image-to-text"
+                                        href="/app/image-converter"
                                         className={cn(
                                             "mt-2 inline-flex items-center justify-center rounded-full bg-[#566AF0] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#4355d6]",
                                             "btn-shadow"
