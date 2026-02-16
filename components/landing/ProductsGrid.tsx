@@ -47,10 +47,10 @@ const products = [
         name: "E-commerce Product Optimiser",
         description: "Generate optimized product listings with AI-powered descriptions and SEO.",
         icon: ShoppingCart,
-        status: "coming-soon",
-        href: "#",
+        status: "live",
+        href: "/app/product-listing-optimizer",
         color: "from-orange-500 to-red-600",
-        features: ["SEO optimization", "Multi-platform", "A/B testing"]
+        features: ["Amazon/eBay/Shopify/Etsy", "Competitor gap analysis", "CSV export"]
     },
     {
         id: "repricing-alerts",
