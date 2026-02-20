@@ -57,8 +57,8 @@ const products = [
         name: "Re-Pricing Alerts",
         description: "Browser extension that monitors competitor prices and sends instant alerts.",
         icon: Bell,
-        status: "coming-soon",
-        href: "#",
+        status: "live",
+        href: "/repricing-alerts",
         color: "from-cyan-500 to-blue-600",
         features: ["Real-time monitoring", "Custom thresholds", "Multi-marketplace"]
     },
