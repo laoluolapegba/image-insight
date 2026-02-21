@@ -67,8 +67,8 @@ const products = [
         name: "Compliance Form Generator",
         description: "Generate UK-compliant forms for micro-businesses instantly.",
         icon: FileCheck,
-        status: "coming-soon",
-        href: "#",
+        status: "live",
+        href: "/compliance-form-generator",
         color: "from-indigo-500 to-purple-600",
         features: ["HMRC compliant", "Auto-fill", "PDF export"]
     }
